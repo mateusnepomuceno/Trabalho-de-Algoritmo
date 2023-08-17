@@ -2,7 +2,8 @@ import pandas as pd
 import math
 
 
-df = pd.read_excel(r'C:/Users/Mateus Nepomuceno/Documents/GitHub/Trabalho-de-Algoritmo')
+file_path = 'C:/Users/Mateus Nepomuceno/Documents/GitHub/Trabalho-de-Algoritmo/cidades_rn_2022 (1).xlsx'
+df = pd.read_excel(file_path)
 
 print(df)
 
