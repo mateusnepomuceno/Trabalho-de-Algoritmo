@@ -1,8 +1,8 @@
 import pandas as pd
 import math
 
-file_path = 'C:/Users/User/OneDrive/Área de Trabalho/cidades_rn_2022.xlsx'
-df = pd.read_excel(file_path)
+
+df = pd.read_excel(r'C:/Users/Mateus Nepomuceno/Documents/GitHub/Trabalho-de-Algoritmo')
 
 print(df)
 
@@ -25,7 +25,7 @@ for i in range(len(df)):
         between_cities_value = math.sin(dis_lat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dist_lon/2)**2
 
         # Evitar que o valor fique fora do intervalo permitido para a função atan2
-        between_cities_value = min(1, between_cities_value)
+        between_cities_value = min(1, int(between_cities_value))
         between_cities_value = max(-1, between_cities_value)
 
         angle_dist = 2 * math.atan2(math.sqrt(between_cities_value), math.sqrt(1 - between_cities_value))
