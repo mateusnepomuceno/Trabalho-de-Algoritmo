@@ -1,12 +1,10 @@
 import pandas as pd
 import math
 
-
 file_path = 'C:/Users/Mateus Nepomuceno/Documents/GitHub/Trabalho-de-Algoritmo/cidades_rn_2022 (1).xlsx'
 df = pd.read_excel(file_path)
 
-
-#Encontrar distância entre as cidades do RN
+# Encontrar distância entre as cidades do RN
 between_cities = {}
 
 for i in range(len(df)):
@@ -24,8 +22,8 @@ for i in range(len(df)):
 
         between_cities_value = math.sin(dis_lat/2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dist_lon/2)**2
 
-        # Evitar que o valor fique fora do intervalo permitido para a função atan2
-        between_cities_value = min(1, int(between_cities_value))
+        # Atualizar entre_cities_value sem conversão para int
+        between_cities_value = min(1, between_cities_value)
         between_cities_value = max(-1, between_cities_value)
 
         angle_dist = 2 * math.atan2(math.sqrt(between_cities_value), math.sqrt(1 - between_cities_value))
@@ -48,33 +46,33 @@ for city, neighbors in between_cities.items():
     for neighbor, distance in neighbors.items():
         graph[city].add((neighbor, distance))
 
-# Função para encontrar a raiz de um conjunto usando compressão de caminho
-def find(parents, vertex):
-    if parents[vertex] != vertex:
-        parents[vertex] = find(parents, parents[vertex])
-    return parents[vertex]
-
-# Função para unir dois conjuntos
-def union(parents, ranks, vertex1, vertex2):
-    root1 = find(parents, vertex1)
-    root2 = find(parents, vertex2)
-
-    if root1 != root2:
-        if ranks[root1] < ranks[root2]:
-            parents[root1] = root2
-        else:
-            parents[root2] = root1
-            if ranks[root1] == ranks[root2]:
-                ranks[root1] += 1
-
 # Algoritmo de Kruskal
 def kruskal(graph):
+    # Função para encontrar a raiz de um conjunto usando compressão de caminho
+    def find(parents, vertex):
+        if parents[vertex] != vertex:
+            parents[vertex] = find(parents, parents[vertex])
+        return parents[vertex]
+
+    # Função para unir dois conjuntos
+    def union(parents, ranks, vertex1, vertex2):
+        root1 = find(parents, vertex1)
+        root2 = find(parents, vertex2)
+
+        if root1 != root2:
+            if ranks[root1] < ranks[root2]:
+                parents[root1] = root2
+            else:
+                parents[root2] = root1
+                if ranks[root1] == ranks[root2]:
+                    ranks[root1] += 1
+
     edges = []
     for vertex, neighbors in graph.items():
         for neighbor, weight in neighbors:
             edges.append((weight, vertex, neighbor))
 
-    edges.sort()
+    edges.sort()  # Ordena as arestas pelo peso (distância)
 
     minimum_spanning_tree = []
     parents = {vertex: vertex for vertex in graph}
@@ -89,4 +87,8 @@ def kruskal(graph):
 
 # Executar o algoritmo de Kruskal no grafo
 minimum_spanning_tree = kruskal(graph)
-print(minimum_spanning_tree)
+
+# Imprimir a árvore geradora mínima
+for edge in minimum_spanning_tree:
+    vertex1, vertex2, weight = edge
+    print(f"City 1: {vertex1}, City 2: {vertex2}, Weight: {weight}")
