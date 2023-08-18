@@ -5,7 +5,6 @@ import math
 file_path = 'C:/Users/Mateus Nepomuceno/Documents/GitHub/Trabalho-de-Algoritmo/cidades_rn_2022 (1).xlsx'
 df = pd.read_excel(file_path)
 
-print(df)
 
 #Encontrar distância entre as cidades do RN
 between_cities = {}
@@ -40,3 +39,54 @@ for i in range(len(df)):
 
         between_cities[city_1][city_2] = cal_dist
         between_cities[city_2][city_1] = cal_dist
+
+# Criar o grafo a partir do dicionário between_cities
+graph = {}
+
+for city, neighbors in between_cities.items():
+    graph[city] = set()
+    for neighbor, distance in neighbors.items():
+        graph[city].add((neighbor, distance))
+
+# Função para encontrar a raiz de um conjunto usando compressão de caminho
+def find(parents, vertex):
+    if parents[vertex] != vertex:
+        parents[vertex] = find(parents, parents[vertex])
+    return parents[vertex]
+
+# Função para unir dois conjuntos
+def union(parents, ranks, vertex1, vertex2):
+    root1 = find(parents, vertex1)
+    root2 = find(parents, vertex2)
+
+    if root1 != root2:
+        if ranks[root1] < ranks[root2]:
+            parents[root1] = root2
+        else:
+            parents[root2] = root1
+            if ranks[root1] == ranks[root2]:
+                ranks[root1] += 1
+
+# Algoritmo de Kruskal
+def kruskal(graph):
+    edges = []
+    for vertex, neighbors in graph.items():
+        for neighbor, weight in neighbors:
+            edges.append((weight, vertex, neighbor))
+
+    edges.sort()
+
+    minimum_spanning_tree = []
+    parents = {vertex: vertex for vertex in graph}
+    ranks = {vertex: 0 for vertex in graph}
+
+    for weight, vertex1, vertex2 in edges:
+        if find(parents, vertex1) != find(parents, vertex2):
+            minimum_spanning_tree.append((vertex1, vertex2, weight))
+            union(parents, ranks, vertex1, vertex2)
+
+    return minimum_spanning_tree
+
+# Executar o algoritmo de Kruskal no grafo
+minimum_spanning_tree = kruskal(graph)
+print(minimum_spanning_tree)
