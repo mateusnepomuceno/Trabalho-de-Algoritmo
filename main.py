@@ -29,6 +29,7 @@ class DistancesCalculator:
                 valor_dist_entre_cid = sin(dist_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dist_lon / 2) ** 2
                 dist_angu = 2 * atan2(sqrt(valor_dist_entre_cid), sqrt(1 - valor_dist_entre_cid))
                 distancia_cal = self.R * dist_angu
+                distancia_cal = round(distancia_cal, 2)
 
                 if cidade1 not in self.dist_entre_cid:
                     self.dist_entre_cid[cidade1] = {}
@@ -128,6 +129,7 @@ class InterfaceGrafica:
         arvore_ger_min_grafo = nx.Graph()
         for aresta in self.minimum_spanning_tree.arvore_ger_min:
             arvore_ger_min_grafo.add_edge(aresta[1], aresta[2], peso=aresta[0])
+
         pos = nx.spring_layout(arvore_ger_min_grafo, k=0.5)
         nx.draw_networkx_edges(arvore_ger_min_grafo, pos, node_size=10)
         nx.draw_networkx_nodes(arvore_ger_min_grafo, pos, node_size=100, node_color='red', alpha=0.8)
@@ -152,7 +154,8 @@ class InterfaceGrafica:
         for child in self.treeview.get_children():
             self.treeview.delete(child)
         for item in items:
-            self.treeview.insert("", "end", values=item)
+            distancia_formatada = f"{round(item[0], 2)} km"
+            self.treeview.insert("", "end", values=(distancia_formatada, item[1], item[2]))
 
 class MainApp:
     def __init__(self, file_path):
