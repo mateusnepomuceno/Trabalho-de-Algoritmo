@@ -5,6 +5,7 @@ from tkinter import ttk
 import networkx as nx
 import matplotlib.pyplot as plt
 
+#classe para calcular a distância entre as cidades
 class DistancesCalculator:
     def __init__(self, file_path):
         self.df = pd.read_excel(file_path)
@@ -12,12 +13,14 @@ class DistancesCalculator:
         self.dist_entre_cid = {}
         self.calculate_distances()
 
+    #percorre todas as cidades no dataframe
     def calculate_distances(self):
         for i in range(len(self.df)):
             cidade1 = self.df.loc[i, 'CIDADE']
             lat1 = radians(self.df.loc[i, 'LAT'])
             lon1 = radians(self.df.loc[i, 'LONG'])
-
+            
+            #calcula distâncias em relação a outras cidades
             for j in range(i + 1, len(self.df)):
                 cidade2 = self.df.loc[j, 'CIDADE']
                 lat2 = radians(self.df.loc[j, 'LAT'])
@@ -31,6 +34,7 @@ class DistancesCalculator:
                 distancia_cal = self.R * dist_angu
                 distancia_cal = round(distancia_cal, 2)
 
+                #armazena a distância entre as cidades no dicionário
                 if cidade1 not in self.dist_entre_cid:
                     self.dist_entre_cid[cidade1] = {}
                 if cidade2 not in self.dist_entre_cid:
@@ -39,6 +43,7 @@ class DistancesCalculator:
                 self.dist_entre_cid[cidade1][cidade2] = distancia_cal
                 self.dist_entre_cid[cidade2][cidade1] = distancia_cal
 
+#classe para construção do grafo
 class Grafo:
     def __init__(self, distances_calculator):
         self.distances_calculator = distances_calculator
@@ -46,14 +51,17 @@ class Grafo:
         self.kruskal()
 
     def kruskal(self):
+        #percorre todas as cidades
         for cidade in self.distances_calculator.dist_entre_cid:
             self.grafo[cidade] = set()
+            #percorre os vizinhos de cada cidade
             for vizinhos in self.distances_calculator.dist_entre_cid[cidade]:
                 if self.distances_calculator.dist_entre_cid[cidade][vizinhos] != 0:
                     peso = self.distances_calculator.dist_entre_cid[cidade][vizinhos]
                     aresta = (vizinhos, peso)
                     self.grafo[cidade].add(aresta)
 
+#classe para encontrar a árvore geradora mínima usando Kruskal
 class Arvore_ger_min:
     def __init__(self, graph_builder):
         self.graph_builder = graph_builder
@@ -73,11 +81,13 @@ class Arvore_ger_min:
             pais[cidade] = cidade
             altura[cidade] = 0
 
+        #função para encontrar a raiz de um conjunto
         def encontrar(cidade):
             if pais[cidade] != cidade:
                 pais[cidade] = encontrar(pais[cidade])
             return pais[cidade]
 
+        #função para unir dois conjuntos
         def unir(cidade1, cidade2):
             raiz1 = encontrar(cidade1)
             raiz2 = encontrar(cidade2)
@@ -95,6 +105,7 @@ class Arvore_ger_min:
                 self.arvore_ger_min.append(aresta)
                 unir(cidade1, cidade2)
 
+#classe para a interface gráfica
 class InterfaceGrafica:
     def __init__(self, minimum_spanning_tree):
         self.minimum_spanning_tree = minimum_spanning_tree
